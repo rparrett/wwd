@@ -58,7 +58,10 @@ fn main() {
 
     hbse.reload().unwrap();
 
-    let mut forecaster = Forecaster::new(config);
+    let mut forecaster = Forecaster::new(
+        config.darksky.unwrap(), 
+        config.locations.unwrap()
+    );
     forecaster.get();
 
     let mut interforecaster = forecaster.clone();
@@ -67,8 +70,6 @@ fn main() {
         Timer::default()
         .interval(Duration::new(60 * 60, 0))
         .for_each(move |_| {
-            println!("hm");
-
             interforecaster.get();
 
             Ok(())
@@ -110,7 +111,7 @@ fn main() {
         Ok(resp)
     }
 
-    let _server = Iron::new(chain).http("96.126.101.191:3000").unwrap();
+    let _server = Iron::new(chain).http(config.http.unwrap().addr.unwrap()).unwrap();
     
     println!("Listening on 3000");
     

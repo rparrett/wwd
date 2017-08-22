@@ -7,7 +7,7 @@ use chrono::{DateTime, NaiveDateTime, Utc, Weekday, Datelike};
 
 use iron::typemap::Key;
 
-use config::Config;
+use config::DarkskyConfig;
 use config::Location;
 
 use std::sync::{Arc, RwLock};
@@ -36,7 +36,8 @@ pub struct BasicWeather {
 
 #[derive(Clone)]
 pub struct Forecaster {
-    pub config: Config,
+    pub config: DarkskyConfig,
+    pub locations: Vec<Location>,
     pub created: String,
     pub cache: Arc<RwLock<Vec<BasicWeekendForecast>>>,
     pub fetched: Arc<RwLock<String>>
@@ -47,9 +48,10 @@ impl Key for Forecaster {
 }
 
 impl Forecaster {
-    pub fn new(config: Config) -> Forecaster {
+    pub fn new(config: DarkskyConfig, locations: Vec<Location>) -> Forecaster {
         Forecaster {
             config: config,
+            locations: locations,
             cache: Arc::new(RwLock::new(Vec::new())),
             created: Utc::now().to_string(),
             fetched: Arc::new(RwLock::new("".to_string()))
@@ -65,7 +67,7 @@ impl Forecaster {
 
         let mut data = Vec::new();
 
-        for x in &config.locations.unwrap() {
+        for x in &self.locations {
             let mut weekend = BasicWeekendForecast {
                 location: x.clone(),
                 days: Vec::new()

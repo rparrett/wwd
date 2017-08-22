@@ -5,8 +5,19 @@ use std::error::Error;
 use toml;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct HttpConfig {
+    pub addr: Option<String>
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct DarkskyConfig {
+    pub secret: Option<String>
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Config {
-    pub secret: Option<String>,
+    pub http: Option<HttpConfig>,
+    pub darksky: Option<DarkskyConfig>,
     pub locations: Option<Vec<Location>>
 }
 
