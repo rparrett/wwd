@@ -47,7 +47,6 @@ fn main() {
     env_logger::init().unwrap();
 
     let mut core = Core::new().unwrap();
-    let timer = Timer::default();
 
     let config = Config::new("config.toml").expect("Failed to open config file.");
 
@@ -65,9 +64,16 @@ fn main() {
     forecaster.get();
 
     let mut interforecaster = forecaster.clone();
+    
+    // with default settings, timer will panic with 
+    // long intervals. we can either increase max_timeout,
+    // tick_duration, or num_slots. In this case, we don't
+    // mind lowering the resolution to 1 second.
 
     let interval = 
-        Timer::default()
+        wheel()
+        .tick_duration(Duration::new(1, 0))
+        .build()
         .interval(Duration::new(60 * 60, 0))
         .for_each(move |_| {
             interforecaster.get();
