@@ -16,7 +16,14 @@ extern crate mount;
 extern crate staticfile;
 extern crate persistent;
 
+extern crate tokio_timer;
+extern crate tokio_core;
+extern crate futures;
+
 use std::path::Path;
+use std::sync::{Arc, RwLock};
+use std::thread;
+use std::time::*;
 
 use iron::prelude::*;
 use iron::status;
@@ -29,11 +36,18 @@ use persistent::{State};
 use config::Config;
 use forecaster::{Forecaster, BasicWeekendForecast};
 
+use tokio_timer::*;
+use futures::*;
+use tokio_core::reactor::Core;
+
 mod forecaster;
 mod config;
 
 fn main() {
     env_logger::init().unwrap();
+
+    let mut core = Core::new().unwrap();
+    let timer = Timer::default();
 
     let config = Config::new("config.toml").expect("Failed to open config file.");
 
@@ -44,9 +58,24 @@ fn main() {
 
     hbse.reload().unwrap();
 
+    let mut forecaster = Forecaster::new(config);
+    forecaster.get();
+
+    let mut interforecaster = forecaster.clone();
+
+    let interval = 
+        Timer::default()
+        .interval(Duration::new(60 * 60, 0))
+        .for_each(move |_| {
+            println!("hm");
+
+            interforecaster.get();
+
+            Ok(())
+        });
+
     let mut router = Router::new();
-    router.get("/", index, "index");
-    router.get("/update", update, "update");
+    router.get("/", move |r: &mut Request| index(r, &forecaster), "index");
 
     let mut mount = Mount::new();
     mount.mount("/", router);
@@ -54,18 +83,11 @@ fn main() {
 
     let mut chain = Chain::new(mount);
 
-    let mut forecaster = Forecaster::new(config);
-    forecaster.get();
-
     chain.link_before(logger_before);
-    chain.link_before(State::<Forecaster>::one(forecaster));
     chain.link_after(hbse);
     chain.link_after(logger_after);
 
-    fn index(req: &mut Request) -> IronResult<Response> {
-        let rwlock = req.get::<State<Forecaster>>().unwrap();
-        let forecaster = rwlock.read().unwrap();
-
+    fn index(req: &mut Request, forecaster: &Forecaster) -> IronResult<Response> {
         #[derive(Serialize)]
         struct TemplateData {
             some_string: String,
@@ -76,8 +98,8 @@ fn main() {
 
         let data = TemplateData {
             some_string: "test2".to_string(),
-            forecaster_cache: forecaster.cache.clone(),
-            fetched: forecaster.fetched.clone(),
+            forecaster_cache: forecaster.cache.read().unwrap().clone(),
+            fetched: forecaster.fetched.read().unwrap().clone(),
             created: forecaster.created.clone()
         };
 
@@ -88,16 +110,9 @@ fn main() {
         Ok(resp)
     }
 
-    fn update(req: &mut Request) -> IronResult<Response> {
-        let rwlock = req.get::<State<Forecaster>>().unwrap();
-        let mut forecaster = rwlock.write().unwrap();
-
-        forecaster.get();
-
-        Ok(Response::with((iron::status::Ok, "Updated")))
-    }
-
     let _server = Iron::new(chain).http("96.126.101.191:3000").unwrap();
     
-    println!("on 3000");
+    println!("Listening on 3000");
+    
+    core.run(interval).unwrap();
 }

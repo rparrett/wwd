@@ -10,6 +10,8 @@ use iron::typemap::Key;
 use config::Config;
 use config::Location;
 
+use std::sync::{Arc, RwLock};
+
 #[inline]
 fn client() -> Client {
     let tc = NativeTlsClient::new().unwrap();
@@ -35,9 +37,9 @@ pub struct BasicWeather {
 #[derive(Clone)]
 pub struct Forecaster {
     pub config: Config,
-    pub cache : Vec<BasicWeekendForecast>,
     pub created: String,
-    pub fetched: String
+    pub cache: Arc<RwLock<Vec<BasicWeekendForecast>>>,
+    pub fetched: Arc<RwLock<String>>
 }
 
 impl Key for Forecaster {
@@ -48,9 +50,9 @@ impl Forecaster {
     pub fn new(config: Config) -> Forecaster {
         Forecaster {
             config: config,
-            cache: Vec::new(),
+            cache: Arc::new(RwLock::new(Vec::new())),
             created: Utc::now().to_string(),
-            fetched: "".to_string()
+            fetched: Arc::new(RwLock::new("".to_string()))
         }
     }
 
@@ -61,7 +63,7 @@ impl Forecaster {
         
         let client = client();
 
-        self.cache.clear();
+        let mut data = Vec::new();
 
         for x in &config.locations.unwrap() {
             let mut weekend = BasicWeekendForecast {
@@ -99,9 +101,17 @@ impl Forecaster {
                 weekend.days.push(weather);
             }
 
-            self.fetched = Utc::now().to_string();
+            data.push(weekend)
+        }
+        
+        let mut fetched = self.fetched.write().unwrap();
+        *fetched = Utc::now().to_string();
 
-            self.cache.push(weekend)
+        let mut cache = self.cache.write().unwrap();
+
+        cache.clear();
+        for i in data.iter() {
+            cache.push((*i).clone());
         }
     }
 }
