@@ -1,0 +1,34 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #002b36;
+    color: #586e75;
+}
+.forecasts {
+    column-count: 2
+}
+.forecasts div h4 {
+    margin: 0.5em 0em 0.5em 0em;
+}
+.forecasts div div {
+    display: table-row;
+}
+.forecasts div div span {
+    display: table-cell;
+    padding: 0.1em 1em 0.1em 1em;
+}
+.forecasts div div span:first-child {
+    white-space: nowrap;
+}
+a {
+    color: #268bd2;
+    text-decoration: none;
+}
+a:hover {
+    color: #2aa198;
+}
+a:active {
+    color: #268bd2;
+}
+a:visited {
+    color: #268bd2;
+}
