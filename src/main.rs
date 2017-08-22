@@ -1,108 +1,103 @@
+#[macro_use]
+extern crate serde_derive;
+
+extern crate toml;
 extern crate darksky;
 extern crate hyper;
 extern crate hyper_native_tls;
 extern crate chrono;
-extern crate termion;
 
-#[macro_use]
-extern crate serde_derive;
-extern crate toml;
+extern crate iron;
+extern crate router;
+extern crate logger;
+extern crate env_logger;
+extern crate handlebars_iron as hbs;
+extern crate mount;
+extern crate staticfile;
+extern crate persistent;
 
-use std::fs::File;
-use std::io::prelude::*;
-use std::fmt;
+use std::path::Path;
 
-use darksky::*;
-use hyper::net::HttpsConnector;
-use hyper::Client;
-use hyper_native_tls::NativeTlsClient;
+use iron::prelude::*;
+use iron::status;
+use router::Router;
+use logger::Logger;
+use hbs::{Template, HandlebarsEngine, DirectorySource};
+use mount::Mount;
+use staticfile::Static;
+use persistent::{State};
+use config::Config;
+use forecaster::{Forecaster, BasicWeekendForecast};
 
-use chrono::{DateTime, NaiveDateTime, Utc, Weekday, Datelike};
-
-use termion::color;
-
-#[derive(Debug, Deserialize)]
-struct Config {
-    secret: Option<String>,
-    locations: Option<Vec<Location>>
-}
-
-#[derive(Debug, Deserialize)]
-struct Location {
-    name: String,
-    lat: f64,
-    lon: f64
-}
-
-#[inline]
-fn client() -> Client {
-    let tc = NativeTlsClient::new().unwrap();
-    let connector = HttpsConnector::new(tc);
-
-    Client::with_connector(connector)
-}
-
-struct Temperature(f64);
-
-impl fmt::Display for Temperature {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if self.0 < 40.0 {
-            write!(f, "{}{:.0}{}", color::Fg(color::Blue), self.0, color::Fg(color::Reset))
-        } else if self.0 < 68.0 {
-            write!(f, "{}{:.0}{}", color::Fg(color::Cyan), self.0, color::Fg(color::Reset))
-        } else if self.0 < 85.0 { 
-            write!(f, "{}{:.0}{}", color::Fg(color::Green), self.0, color::Fg(color::Reset))
-        } else {
-            write!(f, "{}{:.0}{}", color::Fg(color::Red), self.0, color::Fg(color::Reset))
-        }
-    }
-}
+mod forecaster;
+mod config;
 
 fn main() {
-    let mut input = String::new();
+    env_logger::init().unwrap();
 
-    File::open("config.toml").and_then(|mut f| {
-        f.read_to_string(&mut input)
-    }).unwrap();
+    let config = Config::new("config.toml").expect("Failed to open config file.");
 
-    let decoded: Config = toml::from_str(&input).unwrap();
-    
-    let secret: String = decoded.secret.unwrap();
-    
-    let client = client();
+    let (logger_before, logger_after) = Logger::new(None);    
 
-    for x in &decoded.locations.unwrap() {
-        let f = client.get_forecast(&secret, x.lat, x.lon).unwrap();
-        
-        println!(
-            "{}:",
-            x.name
-        );
+    let mut hbse = HandlebarsEngine::new();
+    hbse.add(Box::new(DirectorySource::new("templates", ".hbs")));
 
-        for d in f.daily.unwrap().data.unwrap() {
-            let dt = DateTime::<Utc>::from_utc(
-                NaiveDateTime::from_timestamp(d.time as i64, 0), 
-                Utc
-            );
+    hbse.reload().unwrap();
 
-            // Is this gross?
+    let mut router = Router::new();
+    router.get("/", index, "index");
+    router.get("/update", update, "update");
 
-            match dt.weekday() {
-                Weekday::Fri | Weekday::Sat | Weekday::Sun => {}
-                _ => continue
-            }
+    let mut mount = Mount::new();
+    mount.mount("/", router);
+    mount.mount("/static/", Static::new(Path::new("static")));
 
-            let temperature_min = Temperature(d.temperature_min.unwrap());
-            let temperature_max = Temperature(d.temperature_max.unwrap());
-            let summary = d.summary.unwrap();
+    let mut chain = Chain::new(mount);
 
-            println!(
-                "    {}: high {} low {} / {}", 
-                dt.format("%a %h %e"), 
-                temperature_max, 
-                temperature_min, 
-                summary
-            );
+    let mut forecaster = Forecaster::new(config);
+    forecaster.get();
+
+    chain.link_before(logger_before);
+    chain.link_before(State::<Forecaster>::one(forecaster));
+    chain.link_after(hbse);
+    chain.link_after(logger_after);
+
+    fn index(req: &mut Request) -> IronResult<Response> {
+        let rwlock = req.get::<State<Forecaster>>().unwrap();
+        let forecaster = rwlock.read().unwrap();
+
+        #[derive(Serialize)]
+        struct TemplateData {
+            some_string: String,
+            forecaster_cache: Vec<BasicWeekendForecast>,
+            fetched: String,
+            created: String,
         }
+
+        let data = TemplateData {
+            some_string: "test2".to_string(),
+            forecaster_cache: forecaster.cache.clone(),
+            fetched: forecaster.fetched.clone(),
+            created: forecaster.created.clone()
+        };
+
+        let mut resp = Response::new();
+        
+        resp.set_mut(Template::new("index", data)).set_mut(status::Ok);
+
+        Ok(resp)
     }
+
+    fn update(req: &mut Request) -> IronResult<Response> {
+        let rwlock = req.get::<State<Forecaster>>().unwrap();
+        let mut forecaster = rwlock.write().unwrap();
+
+        forecaster.get();
+
+        Ok(Response::with((iron::status::Ok, "Updated")))
+    }
+
+    let _server = Iron::new(chain).http("96.126.101.191:3000").unwrap();
+    
+    println!("on 3000");
 }

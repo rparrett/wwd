@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title>Arizona Weekend Climbate</title>
+    </head>
+    <body>
+       <p>Test: {{some_string}}</p>
+       <p>Created: {{created}}</p>
+       <p>Fetched: {{fetched}}</p>
+
+       {{#each forecaster_cache}}
+       <div>
+        <h4>{{location.name}}</h4>
+        {{#each days}}
+            <p>
+                <span>{{time}}</span>
+                <span>{{temperature_min}}</span>
+                <span>{{temperature_max}}</span>
+                {{summary}}
+            </p>
+        {{/each}}
+       </div>
+       {{/each}}
+    </body>
+</html>
