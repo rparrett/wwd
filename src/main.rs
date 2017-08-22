@@ -14,15 +14,12 @@ extern crate env_logger;
 extern crate handlebars_iron as hbs;
 extern crate mount;
 extern crate staticfile;
-extern crate persistent;
 
 extern crate tokio_timer;
 extern crate tokio_core;
 extern crate futures;
 
 use std::path::Path;
-use std::sync::{Arc, RwLock};
-use std::thread;
 use std::time::*;
 
 use iron::prelude::*;
@@ -32,7 +29,6 @@ use logger::Logger;
 use hbs::{Template, HandlebarsEngine, DirectorySource};
 use mount::Mount;
 use staticfile::Static;
-use persistent::{State};
 use config::Config;
 use forecaster::{Forecaster, BasicWeekendForecast};
 
@@ -94,7 +90,7 @@ fn main() {
     chain.link_after(hbse);
     chain.link_after(logger_after);
 
-    fn index(req: &mut Request, forecaster: &Forecaster) -> IronResult<Response> {
+    fn index(_: &mut Request, forecaster: &Forecaster) -> IronResult<Response> {
         #[derive(Serialize)]
         struct TemplateData {
             some_string: String,
