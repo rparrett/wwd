@@ -15,14 +15,14 @@
         </p>
     
         <div class="forecasts">
-t             {{#each forecaster_cache}}
+            {{#each forecaster_cache}}
             <div>
                 <h4>{{location.name}}</h4>
                 {{#each days}}
                 <div>
                     <span>{{time}}</span>
-                    <span>{{temperature_min}}</span>
-                    <span>{{temperature_max}}</span>
+                    <span>{{round temperature_min}}</span>
+                    <span>{{round temperature_max}}</span>
                     <span>{{summary}}</span>
                 </div>
                 {{/each}}

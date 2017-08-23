@@ -27,6 +27,7 @@ use iron::status;
 use router::Router;
 use logger::Logger;
 use hbs::{Template, HandlebarsEngine, DirectorySource};
+use hbs::handlebars::{Helper, RenderContext, RenderError, Handlebars};
 use mount::Mount;
 use staticfile::Static;
 use config::Config;
@@ -39,6 +40,14 @@ use tokio_core::reactor::Core;
 mod forecaster;
 mod config;
 
+fn round(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
+    let param = h.param(0).unwrap().value();
+    let rendered = format!("{:.0}", param.as_f64().unwrap().round());
+    try!(rc.writer.write(rendered.into_bytes().as_ref()));
+
+    Ok(())
+}
+
 fn main() {
     env_logger::init().unwrap();
 
@@ -49,6 +58,7 @@ fn main() {
     let (logger_before, logger_after) = Logger::new(None);    
 
     let mut hbse = HandlebarsEngine::new();
+    hbse.handlebars_mut().register_helper("round", Box::new(round));
     hbse.add(Box::new(DirectorySource::new("templates", ".hbs")));
 
     hbse.reload().unwrap();
@@ -93,14 +103,12 @@ fn main() {
     fn index(_: &mut Request, forecaster: &Forecaster) -> IronResult<Response> {
         #[derive(Serialize)]
         struct TemplateData {
-            some_string: String,
             forecaster_cache: Vec<BasicWeekendForecast>,
             fetched: String,
             created: String,
         }
 
         let data = TemplateData {
-            some_string: "test2".to_string(),
             forecaster_cache: forecaster.cache.read().unwrap().clone(),
             fetched: forecaster.fetched.read().unwrap().clone(),
             created: forecaster.created.clone()
