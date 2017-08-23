@@ -16,15 +16,20 @@
     
         <div class="forecasts">
             {{#each forecaster_cache}}
-            <div>
-                <h4>{{location.name}}</h4>
+            <div class="forecast">
+                <div class="location-name"><strong>{{location.name}}</strong></div>
                 {{#each days}}
-                <div>
-                    <span>{{time}}</span>
-                    <span style="color: {{color temperature_max}}">{{round temperature_max}}</span>
-                    <span style="color: {{color temperature_min}}">{{round temperature_min}}</span>
+                <div class="day">
+                    <div><span>{{time}}</span></div>
+                    <div style="color: {{color temperature_max}}"><span>{{round temperature_max}}</span></div>
+                    <div style="color: {{color temperature_min}}"><span>{{round temperature_min}}</span></div>
+                    <div class="summary-cell"><span>{{summary}}</span></div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="summary-only-row">
                     <span>{{summary}}</span>
                 </div>
+                <div class="clearfix"></div>
                 {{/each}}
             </div>
             {{/each}}

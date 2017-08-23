@@ -3,32 +3,66 @@ body {
     background-color: #002b36;
     color: #586e75;
 }
-.forecasts {
-    column-count: 2
-}
-.forecasts div h4 {
-    margin: 0.5em 0em 0.5em 0em;
-}
-.forecasts div div {
-    display: table-row;
-}
-.forecasts div div span {
-    display: table-cell;
-    padding: 0.1em 1em 0.1em 1em;
-}
-.forecasts div div span:first-child {
-    white-space: nowrap;
+h1, h2, h3, h4, h5, h6, strong {
+    color: #6e8992;
 }
 a {
     color: #268bd2;
     text-decoration: none;
 }
-a:hover {
-    color: #2aa198;
-}
-a:active {
-    color: #268bd2;
-}
 a:visited {
     color: #268bd2;
+}
+a:active {
+    color: #4ca2df;
+}
+a:hover {
+    color: #4ca2df;
+}
+.forecasts {
+    column-count: 1;
+}
+.forecast {
+    margin-bottom: 1em;
+}
+.forecast .location-name {
+    margin-bottom: 0.2em;
+}
+.forecast .day div:nth-child(1) {
+    float: left;
+    width: 6em;
+}
+.forecast .day div:nth-child(2) {
+    float: left;
+    width: 2em;
+}
+.forecast .day div:nth-child(3) {
+    float: left;
+    width: 2em;
+}
+.forecast .day div:nth-child(4) {
+    float: left;
+}
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+.summary-cell {
+    display: none;
+}
+.summary-only-row {
+    display: block;
+}
+
+@media (min-width: 768px) {
+    .summary-only-row {
+        display: none !important;
+    }
+    .summary-cell {
+        display: block !important;
+    }
+    .forecasts {
+        column-count: 2 !important;
+    }
 }
