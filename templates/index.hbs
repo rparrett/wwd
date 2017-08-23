@@ -21,8 +21,8 @@
                 {{#each days}}
                 <div>
                     <span>{{time}}</span>
-                    <span>{{round temperature_max}}</span>
-                    <span>{{round temperature_min}}</span>
+                    <span style="color: {{color temperature_max}}">{{round temperature_max}}</span>
+                    <span style="color: {{color temperature_min}}">{{round temperature_min}}</span>
                     <span>{{summary}}</span>
                 </div>
                 {{/each}}
