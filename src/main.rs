@@ -6,6 +6,7 @@ extern crate darksky;
 extern crate hyper;
 extern crate hyper_native_tls;
 extern crate chrono;
+extern crate chrono_tz;
 
 extern crate iron;
 extern crate router;
@@ -97,14 +98,12 @@ fn main() {
         #[derive(Serialize)]
         struct TemplateData {
             forecaster_cache: Vec<BasicWeekendForecast>,
-            fetched: String,
-            created: String,
+            fetched: String
         }
 
         let data = TemplateData {
             forecaster_cache: forecaster.cache.read().unwrap().clone(),
-            fetched: forecaster.fetched.read().unwrap().clone(),
-            created: forecaster.created.clone()
+            fetched: forecaster.fetched.read().unwrap().clone().format("%a %b %e @ %l:%M:%S %P").to_string(),
         };
 
         let mut resp = Response::new();

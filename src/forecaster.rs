@@ -3,7 +3,9 @@ use hyper::net::HttpsConnector;
 use hyper::Client;
 use hyper_native_tls::NativeTlsClient;
 
-use chrono::{DateTime, NaiveDateTime, Utc, Weekday, Datelike};
+use chrono::{DateTime, Utc, Weekday, Datelike, TimeZone};
+use chrono_tz::Tz;
+use chrono_tz::US::Arizona;
 
 use iron::typemap::Key;
 
@@ -38,9 +40,9 @@ pub struct BasicWeather {
 pub struct Forecaster {
     pub config: DarkskyConfig,
     pub locations: Vec<Location>,
-    pub created: String,
+    pub created: DateTime<Tz>,
     pub cache: Arc<RwLock<Vec<BasicWeekendForecast>>>,
-    pub fetched: Arc<RwLock<String>>
+    pub fetched: Arc<RwLock<DateTime<Tz>>>
 }
 
 impl Key for Forecaster {
@@ -53,8 +55,8 @@ impl Forecaster {
             config: config,
             locations: locations,
             cache: Arc::new(RwLock::new(Vec::new())),
-            created: Utc::now().to_string(),
-            fetched: Arc::new(RwLock::new("".to_string()))
+            created: Utc::now().with_timezone(&Arizona),
+            fetched: Arc::new(RwLock::new(Utc::now().with_timezone(&Arizona)))
         }
     }
 
@@ -81,10 +83,7 @@ impl Forecaster {
             );
 
             for d in f.daily.unwrap().data.unwrap() {
-                let dt = DateTime::<Utc>::from_utc(
-                    NaiveDateTime::from_timestamp(d.time as i64, 0), 
-                    Utc
-                );
+                let dt = Utc.timestamp(d.time as i64, 0); 
 
                 // Is this gross?
 
@@ -107,7 +106,7 @@ impl Forecaster {
         }
         
         let mut fetched = self.fetched.write().unwrap();
-        *fetched = Utc::now().to_string();
+        *fetched = Utc::now().with_timezone(&Arizona);
 
         let mut cache = self.cache.write().unwrap();
 
