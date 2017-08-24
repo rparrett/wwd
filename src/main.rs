@@ -48,30 +48,32 @@ fn main() {
 
     let config = Config::new("config.toml").expect("Failed to open config file.");
 
-    let (logger_before, logger_after) = Logger::new(None);    
+    let (logger_before, logger_after) = Logger::new(None);
 
     let mut hbse = HandlebarsEngine::new();
-    hbse.handlebars_mut().register_helper("round", Box::new(helper::round));
-    hbse.handlebars_mut().register_helper("color", Box::new(helper::color));
+    hbse.handlebars_mut().register_helper(
+        "round",
+        Box::new(helper::round),
+    );
+    hbse.handlebars_mut().register_helper(
+        "color",
+        Box::new(helper::color),
+    );
     hbse.add(Box::new(DirectorySource::new("templates", ".hbs")));
 
     hbse.reload().unwrap();
 
-    let mut forecaster = Forecaster::new(
-        config.darksky.unwrap(), 
-        config.locations.unwrap()
-    );
+    let mut forecaster = Forecaster::new(config.darksky.unwrap(), config.locations.unwrap());
     forecaster.get();
 
     let mut interforecaster = forecaster.clone();
-    
-    // with default settings, timer will panic with 
+
+    // with default settings, timer will panic with
     // long intervals. we can either increase max_timeout,
     // tick_duration, or num_slots. In this case, we don't
     // mind lowering the resolution to 1 second.
 
-    let interval = 
-        wheel()
+    let interval = wheel()
         .tick_duration(Duration::new(1, 0))
         .build()
         .interval(Duration::new(60 * 60, 0))
@@ -98,24 +100,34 @@ fn main() {
         #[derive(Serialize)]
         struct TemplateData {
             forecaster_cache: Vec<BasicWeekendForecast>,
-            fetched: String
+            fetched: String,
         }
 
         let data = TemplateData {
             forecaster_cache: forecaster.cache.read().unwrap().clone(),
-            fetched: forecaster.fetched.read().unwrap().clone().format("%a %b %e @ %l:%M:%S %P").to_string(),
+            fetched: forecaster
+                .fetched
+                .read()
+                .unwrap()
+                .clone()
+                .format("%a %b %e @ %l:%M:%S %P")
+                .to_string(),
         };
 
         let mut resp = Response::new();
-        
-        resp.set_mut(Template::new("index", data)).set_mut(status::Ok);
+
+        resp.set_mut(Template::new("index", data)).set_mut(
+            status::Ok,
+        );
 
         Ok(resp)
     }
 
-    let _server = Iron::new(chain).http(config.http.unwrap().addr.unwrap()).unwrap();
-    
+    let _server = Iron::new(chain)
+        .http(config.http.unwrap().addr.unwrap())
+        .unwrap();
+
     println!("Listening on 3000");
-    
+
     core.run(interval).unwrap();
 }

@@ -6,26 +6,26 @@ use toml;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct HttpConfig {
-    pub addr: Option<String>
+    pub addr: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DarkskyConfig {
-    pub secret: Option<String>
+    pub secret: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Config {
     pub http: Option<HttpConfig>,
     pub darksky: Option<DarkskyConfig>,
-    pub locations: Option<Vec<Location>>
+    pub locations: Option<Vec<Location>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Location {
     pub name: String,
     pub lat: f64,
-    pub lon: f64
+    pub lon: f64,
 }
 
 impl Config {

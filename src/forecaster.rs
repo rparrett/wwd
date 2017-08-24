@@ -25,7 +25,7 @@ fn client() -> Client {
 #[derive(Clone, Debug, Serialize)]
 pub struct BasicWeekendForecast {
     location: Location,
-    days: Vec<BasicWeather>
+    days: Vec<BasicWeather>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -33,7 +33,7 @@ pub struct BasicWeather {
     time: String,
     temperature_min: f64,
     temperature_max: f64,
-    summary: String
+    summary: String,
 }
 
 #[derive(Clone)]
@@ -42,7 +42,7 @@ pub struct Forecaster {
     pub locations: Vec<Location>,
     pub created: DateTime<Tz>,
     pub cache: Arc<RwLock<Vec<BasicWeekendForecast>>>,
-    pub fetched: Arc<RwLock<DateTime<Tz>>>
+    pub fetched: Arc<RwLock<DateTime<Tz>>>,
 }
 
 impl Key for Forecaster {
@@ -56,7 +56,7 @@ impl Forecaster {
             locations: locations,
             cache: Arc::new(RwLock::new(Vec::new())),
             created: Utc::now().with_timezone(&Arizona),
-            fetched: Arc::new(RwLock::new(Utc::now().with_timezone(&Arizona)))
+            fetched: Arc::new(RwLock::new(Utc::now().with_timezone(&Arizona))),
         }
     }
 
@@ -64,7 +64,7 @@ impl Forecaster {
         let config = self.config.clone();
 
         let secret: String = config.secret.unwrap();
-        
+
         let client = client();
 
         let mut data = Vec::new();
@@ -72,31 +72,28 @@ impl Forecaster {
         for x in &self.locations {
             let mut weekend = BasicWeekendForecast {
                 location: x.clone(),
-                days: Vec::new()
+                days: Vec::new(),
             };
 
             let f = client.get_forecast(&secret, x.lat, x.lon).unwrap();
-            
-            println!(
-                "{}:",
-                x.name
-            );
+
+            println!("{}:", x.name);
 
             for d in f.daily.unwrap().data.unwrap() {
-                let dt = Utc.timestamp(d.time as i64, 0); 
+                let dt = Utc.timestamp(d.time as i64, 0);
 
                 // Is this gross?
 
                 match dt.weekday() {
                     Weekday::Fri | Weekday::Sat | Weekday::Sun => {}
-                    _ => continue
+                    _ => continue,
                 }
 
                 let weather = BasicWeather {
-                    time: dt.format("%a %h %e").to_string(), 
+                    time: dt.format("%a %h %e").to_string(),
                     temperature_min: d.temperature_min.unwrap(),
                     temperature_max: d.temperature_max.unwrap(),
-                    summary: d.summary.unwrap()
+                    summary: d.summary.unwrap(),
                 };
 
                 weekend.days.push(weather);
@@ -104,7 +101,7 @@ impl Forecaster {
 
             data.push(weekend)
         }
-        
+
         let mut fetched = self.fetched.write().unwrap();
         *fetched = Utc::now().with_timezone(&Arizona);
 
