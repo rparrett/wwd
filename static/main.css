@@ -24,6 +24,7 @@ a:hover {
 }
 .forecast {
     margin-bottom: 1em;
+    break-inside: avoid;
 }
 .forecast .location-name {
     margin-bottom: 0.2em;
