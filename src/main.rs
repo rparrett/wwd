@@ -11,6 +11,8 @@ extern crate chrono_tz;
 extern crate iron;
 extern crate router;
 extern crate logger;
+#[macro_use]
+extern crate log;
 extern crate env_logger;
 extern crate handlebars_iron as hbs;
 extern crate mount;
@@ -22,11 +24,14 @@ extern crate futures;
 
 use std::path::Path;
 use std::time::*;
+use std::env;
 
 use iron::prelude::*;
 use iron::status;
 use router::Router;
 use logger::Logger;
+use env_logger::LogBuilder;
+use chrono::Local;
 use hbs::{Template, HandlebarsEngine, DirectorySource};
 use mount::Mount;
 use staticfile::Static;
@@ -42,7 +47,18 @@ mod forecaster;
 mod config;
 
 fn main() {
-    env_logger::init().unwrap();
+    LogBuilder::new()
+        .format(|record| {
+            format!(
+                "{} [{}] - {}",
+                Local::now().format("%Y-%m-%dT%H:%M:%S"),
+                record.level(),
+                record.args()
+            )
+        })
+        .parse(&env::var("RUST_LOG").unwrap())
+        .init()
+        .unwrap();
 
     let mut core = Core::new().unwrap();
 
@@ -124,10 +140,10 @@ fn main() {
     }
 
     let _server = Iron::new(chain)
-        .http(config.http.unwrap().addr.unwrap())
+        .http(config.http.clone().unwrap().addr.unwrap())
         .unwrap();
 
-    println!("Listening on 3000");
+    info!("Listening on {}", config.http.unwrap().addr.unwrap());
 
     core.run(interval).unwrap();
 }

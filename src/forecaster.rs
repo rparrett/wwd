@@ -61,6 +61,8 @@ impl Forecaster {
     }
 
     pub fn get(&mut self) {
+        info!("Starting fetch.");
+
         let config = self.config.clone();
 
         let secret: String = config.secret.unwrap();
@@ -70,14 +72,14 @@ impl Forecaster {
         let mut data = Vec::new();
 
         for x in &self.locations {
+            info!("Fetching {}", x.name);
+
             let mut weekend = BasicWeekendForecast {
                 location: x.clone(),
                 days: Vec::new(),
             };
 
             let f = client.get_forecast(&secret, x.lat, x.lon).unwrap();
-
-            println!("{}:", x.name);
 
             for d in f.daily.unwrap().data.unwrap() {
                 let dt = Utc.timestamp(d.time as i64, 0);
@@ -101,6 +103,8 @@ impl Forecaster {
 
             data.push(weekend)
         }
+
+        info!("Updating cache");
 
         let mut fetched = self.fetched.write().unwrap();
         *fetched = Utc::now().with_timezone(&Arizona);
