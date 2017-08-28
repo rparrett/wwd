@@ -49,18 +49,22 @@ mod forecaster;
 mod config;
 
 fn main() {
-    LogBuilder::new()
-        .format(|record| {
-            format!(
-                "{} [{}] - {}",
-                Local::now().format("%Y-%m-%dT%H:%M:%S"),
-                record.level(),
-                record.args()
-            )
-        })
-        .parse(&env::var("RUST_LOG").unwrap())
-        .init()
-        .unwrap();
+    let mut builder = LogBuilder::new();
+
+    builder.format(|record| {
+        format!(
+            "{} [{}] - {}",
+            Local::now().format("%Y-%m-%dT%H:%M:%S"),
+            record.level(),
+            record.args()
+        )
+    });
+
+    if env::var("RUST_LOG").is_ok() {
+        builder.parse(&env::var("RUST_LOG").unwrap());
+    }
+
+    builder.init().unwrap();
 
     let mut core = Core::new().unwrap();
 
