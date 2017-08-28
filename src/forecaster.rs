@@ -4,8 +4,6 @@ use hyper::Client;
 use hyper_native_tls::NativeTlsClient;
 
 use chrono::{DateTime, Utc, Weekday, Datelike, TimeZone};
-use chrono_tz::Tz;
-use chrono_tz::US::Arizona;
 
 use iron::typemap::Key;
 
@@ -40,9 +38,9 @@ pub struct BasicWeather {
 pub struct Forecaster {
     pub config: DarkskyConfig,
     pub locations: Vec<Location>,
-    pub created: DateTime<Tz>,
+    pub created: DateTime<Utc>,
     pub cache: Arc<RwLock<Vec<BasicWeekendForecast>>>,
-    pub fetched: Arc<RwLock<DateTime<Tz>>>,
+    pub fetched: Arc<RwLock<DateTime<Utc>>>,
 }
 
 impl Key for Forecaster {
@@ -55,8 +53,8 @@ impl Forecaster {
             config: config,
             locations: locations,
             cache: Arc::new(RwLock::new(Vec::new())),
-            created: Utc::now().with_timezone(&Arizona),
-            fetched: Arc::new(RwLock::new(Utc::now().with_timezone(&Arizona))),
+            created: Utc::now(),
+            fetched: Arc::new(RwLock::new(Utc::now())),
         }
     }
 
@@ -107,7 +105,7 @@ impl Forecaster {
         info!("Updating cache");
 
         let mut fetched = self.fetched.write().unwrap();
-        *fetched = Utc::now().with_timezone(&Arizona);
+        *fetched = Utc::now();
 
         let mut cache = self.cache.write().unwrap();
 

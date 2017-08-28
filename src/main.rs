@@ -1,12 +1,12 @@
 #[macro_use]
 extern crate serde_derive;
+extern crate serde_json;
 
 extern crate toml;
 extern crate darksky;
 extern crate hyper;
 extern crate hyper_native_tls;
 extern crate chrono;
-extern crate chrono_tz;
 
 extern crate iron;
 extern crate router;
@@ -42,6 +42,8 @@ use tokio_timer::*;
 use futures::*;
 use tokio_core::reactor::Core;
 
+use chrono::{DateTime, Utc};
+
 mod helper;
 mod forecaster;
 mod config;
@@ -74,6 +76,10 @@ fn main() {
     hbse.handlebars_mut().register_helper(
         "color",
         Box::new(helper::color),
+    );
+    hbse.handlebars_mut().register_helper(
+        "time_diff_in_words",
+        Box::new(helper::time_diff_in_words),
     );
     hbse.add(Box::new(DirectorySource::new("templates", ".hbs")));
 
@@ -116,18 +122,14 @@ fn main() {
         #[derive(Serialize)]
         struct TemplateData {
             forecaster_cache: Vec<BasicWeekendForecast>,
-            fetched: String,
+            fetched: DateTime<Utc>,
+            now: DateTime<Utc>,
         }
 
         let data = TemplateData {
             forecaster_cache: forecaster.cache.read().unwrap().clone(),
-            fetched: forecaster
-                .fetched
-                .read()
-                .unwrap()
-                .clone()
-                .format("%a %b %e @ %l:%M:%S %P")
-                .to_string(),
+            fetched: forecaster.fetched.read().unwrap().clone(),
+            now: Utc::now(),
         };
 
         let mut resp = Response::new();
