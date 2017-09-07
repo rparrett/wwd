@@ -29,8 +29,8 @@ pub struct BasicWeekendForecast {
 #[derive(Clone, Debug, Serialize)]
 pub struct BasicWeather {
     time: String,
-    temperature_min: f64,
-    temperature_max: f64,
+    temperature_low: f64,
+    temperature_high: f64,
     summary: String,
 }
 
@@ -91,8 +91,8 @@ impl Forecaster {
 
                 let weather = BasicWeather {
                     time: dt.format("%a %h %e").to_string(),
-                    temperature_min: d.temperature_min.unwrap(),
-                    temperature_max: d.temperature_max.unwrap(),
+                    temperature_low: d.temperature_low.unwrap(),
+                    temperature_high: d.temperature_high.unwrap(),
                     summary: d.summary.unwrap(),
                 };
 
