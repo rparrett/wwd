@@ -90,7 +90,10 @@ fn main() {
     hbse.reload().unwrap();
 
     let mut forecaster = Forecaster::new(config.darksky.unwrap(), config.locations.unwrap());
-    forecaster.get();
+    match forecaster.get() {
+        Ok(f) => f,
+        Err(_) => error!("Failed to retrieve forecast."),
+    };
 
     let mut interforecaster = forecaster.clone();
 
@@ -104,7 +107,10 @@ fn main() {
         .build()
         .interval(Duration::new(60 * 60, 0))
         .for_each(move |_| {
-            interforecaster.get();
+            match interforecaster.get() {
+                Ok(f) => f,
+                Err(_) => error!("Failed to retrieve forecast."),
+            };
 
             Ok(())
         });

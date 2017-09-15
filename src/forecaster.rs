@@ -58,7 +58,7 @@ impl Forecaster {
         }
     }
 
-    pub fn get(&mut self) {
+    pub fn get(&mut self) -> Result<()> {
         info!("Starting fetch.");
 
         let config = self.config.clone();
@@ -77,7 +77,7 @@ impl Forecaster {
                 days: Vec::new(),
             };
 
-            let f = client.get_forecast(&secret, x.lat, x.lon).unwrap();
+            let f = client.get_forecast(&secret, x.lat, x.lon)?;
 
             for d in f.daily.unwrap().data.unwrap() {
                 let dt = Utc.timestamp(d.time as i64, 0);
@@ -113,5 +113,7 @@ impl Forecaster {
         for i in data.iter() {
             cache.push((*i).clone());
         }
+
+        Ok(())
     }
 }
