@@ -8,108 +8,168 @@ secret = "abcdef123457890abcdef1234567890a"
 
 [[locations]]
 
+name = "South Mountain"
+lat = 33.36302
+lon = -111.98559
+link = "https://www.mountainproject.com/v/south-mountain/106154495"
+
+[[locations]]
+
+name = "Beardsley"
+lat = 33.68234
+lon = -112.04284
+link = "https://www.mountainproject.com/v/beardsley-boulders/105800798"
+
+[[locations]]
+
+name = "Camelback"
+lat = 33.5145
+lon = -111.9618
+link = "https://www.mountainproject.com/v/camelback-mountain/105787836"
+
+[[locations]]
+
+name = "McDowells"
+lat = 33.68665
+lon = -111.8089
+link = "https://www.mountainproject.com/v/mcdowell-mountains/105787825"
+
+[[locations]]
+
 name = "Queen Creek Canyon"
 lat = 33.30561
 lon = -111.07634
+link = "https://www.mountainproject.com/v/queen-creek-canyon/105788089"
 
 [[locations]]
 
 name = "Mt Lemmon Summit"
 lat = 32.4325
 lon = -110.796
+link = "https://www.mountainproject.com/v/mount-lemmon-catalina-highway/106822703"
 
 [[locations]]
 
 name = "Mt Lemmon Mid"
 lat = 32.40962
 lon = -110.70488
+link = "https://www.mountainproject.com/v/mount-lemmon-catalina-highway/106822703"
 
 [[locations]]
 
 name = "Mt Lemmon Lower"
 lat = 32.33746
 lon = -110.69046
+link = "https://www.mountainproject.com/v/mount-lemmon-catalina-highway/106822703"
 
 [[ locations ]]
 
 name = "Cochise Stronghold"
 lat = 31.9212
 lon = -109.98703
+link = "https://www.mountainproject.com/v/cochise-stronghold/105738034"
 
 [[ locations ]]
 
 name = "Priest Draw"
 lat = 35.0816
 lon = -111.5995
+link = "https://www.mountainproject.com/v/priest-draw/107095705"
 
 [[ locations ]]
 
 name = "The Peaks"
 lat = 35.30692
 lon = -111.70527
+link = "https://www.mountainproject.com/v/the-peaks-crag/110519565"
 
 [[ locations ]]
 
 name = "Anvil Boulders"
 lat = 34.87223
 lon = -111.75375
+link = "https://www.mountainproject.com/v/the-anvil-boulders/105825188"
 
 [[ locations ]]
 
 name = "Oak Creek Canyon"
 lat = 34.9524
 lon = -111.7543
+link = "https://www.mountainproject.com/v/oak-creek-canyon/106171649"
 
 [[ locations ]]
 
 name = "East Clear Creek"
 lat = 34.94444
 lon = -110.6633
+link = "https://www.mountainproject.com/v/east-clear-creek/110557186"
 
 [[ locations ]]
 
 name = "Blue Ridge Reservoir"
 lat = 34.5549
 lon = -111.1952
+link = "https://www.mountainproject.com/v/blue-ridge-reservoir-/106914807"
 
 [[ locations ]]
 
 name = "Jack's Canyon"
 lat = 34.7547
 lon = -111.062
+link = "https://www.mountainproject.com/v/jacks-canyon/105799277"
 
 [[ locations ]]
 
 name = "Isolation Canyon"
 lat = 34.36127
 lon = -111.45026
+link = "https://www.mountainproject.com/v/isolation-canyon/105816083"
 
 [[ locations ]]
 
 name = "The Homestead"
 lat = 33.17393
 lon = -110.78165
+link = "https://www.mountainproject.com/v/the-homestead/105801318"
 
 [[ locations ]]
 
 name = "Groom Creek"
 lat = 34.4669
 lon = -112.4412
+link = "https://www.mountainproject.com/v/groom-creek/105905330"
 
 [[ locations ]]
 
 name = "Granite Dells"
 lat = 34.5913
 lon = -112.4215
+link = "https://www.mountainproject.com/v/granite-dells-/105787844"
 
 [[ locations ]]
 
 name = "Joshua Tree National Park"
 lat = 34.0122
 lon = -116.168
+link = "https://www.mountainproject.com/v/joshua-tree-national-park/105720495"
 
 [[ locations ]]
 
 name = "Tramway"
 lat = 33.81302
 lon = -116.63843
+link = "https://www.mountainproject.com/v/the-tramway/105991060"
+
+[[ locations ]]
+
+name = "Red Rock"
+lat = 36.13129
+lon = -115.42453
+link = "https://www.mountainproject.com/v/red-rock/105731932"
+
+[[ locations ]]
+
+name = "Mt Charleston"
+lat = 36.27224
+lon = -115.58833
+link = "https://www.mountainproject.com/v/mount-charleston/105850026"
