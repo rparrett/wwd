@@ -17,7 +17,11 @@
         <div class="forecasts">
             {{#each forecaster_cache}}
             <div class="forecast">
-                <div class="location-name"><strong>{{location.name}}</strong></div>
+                <div class="location-name">
+                    <a href="{{location.link}}">&beta;</a>
+                    <a href="https://darksky.net/forecast/{{location.lat}},{{location.lon}}/us12/en">&#x26A1;</a>
+                    <strong>{{location.name}}</strong>
+                </div>
                 {{#each days}}
                 <div class="day">
                     <div><span>{{time}}</span></div>

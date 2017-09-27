@@ -26,6 +26,7 @@ pub struct Location {
     pub name: String,
     pub lat: f64,
     pub lon: f64,
+    pub link: String,
 }
 
 impl Config {
