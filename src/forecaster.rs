@@ -110,7 +110,7 @@ impl Forecaster {
         let mut cache = self.cache.write().unwrap();
 
         cache.clear();
-        for i in data.iter() {
+        for i in &data {
             cache.push((*i).clone());
         }
 
