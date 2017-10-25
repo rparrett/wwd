@@ -7,7 +7,7 @@ use hbs::handlebars::{Helper, RenderContext, RenderError, Handlebars};
 pub fn round(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
     let param = h.param(0).unwrap().value();
     let rendered = format!("{:.0}", param.as_f64().unwrap().round());
-    try!(rc.writer.write(rendered.into_bytes().as_ref()));
+    try!(rc.writer.write_all(rendered.into_bytes().as_ref()));
 
     Ok(())
 }
@@ -28,7 +28,7 @@ pub fn color(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), R
         "red"
     };
 
-    try!(rc.writer.write(color.as_ref()));
+    try!(rc.writer.write_all(color.as_ref()));
 
     Ok(())
 }
@@ -58,7 +58,7 @@ pub fn time_diff_in_words(
         format!("{} hours", hours)
     };
 
-    try!(rc.writer.write(rendered.into_bytes().as_ref()));
+    try!(rc.writer.write_all(rendered.into_bytes().as_ref()));
 
     Ok(())
 }
