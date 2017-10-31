@@ -95,7 +95,10 @@ fn main() {
         Err(_) => error!("Failed to retrieve forecast."),
     };
 
-    let mut interforecaster = forecaster.clone();
+    // we're cloning forecaster, which doesn't clone the underlying
+    // reference counted / locked fields.
+
+    let mut interval_forecaster = forecaster.clone();
 
     // with default settings, timer will panic with
     // long intervals. we can either increase max_timeout,
@@ -107,7 +110,7 @@ fn main() {
         .build()
         .interval(Duration::new(60 * 60, 0))
         .for_each(move |_| {
-            match interforecaster.get() {
+            match interval_forecaster.get() {
                 Ok(f) => f,
                 Err(_) => error!("Failed to retrieve forecast."),
             };
