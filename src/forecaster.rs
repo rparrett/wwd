@@ -67,6 +67,10 @@ impl Forecaster {
 
         let client = client();
 
+        // Create a new vector to store the new forecast data so
+        // that we don't need to hold a write lock while we make
+        // API calls.
+
         let mut data = Vec::new();
 
         for x in &self.locations {
