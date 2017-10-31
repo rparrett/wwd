@@ -27,26 +27,25 @@ use std::time::*;
 use std::env;
 
 use iron::prelude::*;
-use iron::status;
 use router::Router;
 use logger::Logger;
 use env_logger::LogBuilder;
 use chrono::Local;
-use hbs::{Template, HandlebarsEngine, DirectorySource};
+use hbs::{HandlebarsEngine, DirectorySource};
 use mount::Mount;
 use staticfile::Static;
 use config::Config;
-use forecaster::{Forecaster, BasicWeekendForecast};
+use forecaster::Forecaster;
 
 use tokio_timer::*;
 use futures::*;
 use tokio_core::reactor::Core;
 
-use chrono::{DateTime, Utc};
 
 mod helper;
 mod forecaster;
 mod config;
+mod handlers;
 
 fn main() {
     let mut builder = LogBuilder::new();
@@ -119,7 +118,11 @@ fn main() {
         });
 
     let mut router = Router::new();
-    router.get("/", move |r: &mut Request| index(r, &forecaster), "index");
+    router.get(
+        "/",
+        move |r: &mut Request| handlers::get_index(r, &forecaster),
+        "index",
+    );
 
     let mut mount = Mount::new();
     mount.mount("/", router);
@@ -130,29 +133,6 @@ fn main() {
     chain.link_before(logger_before);
     chain.link_after(hbse);
     chain.link_after(logger_after);
-
-    fn index(_: &mut Request, forecaster: &Forecaster) -> IronResult<Response> {
-        #[derive(Serialize)]
-        struct TemplateData {
-            forecaster_cache: Vec<BasicWeekendForecast>,
-            fetched: DateTime<Utc>,
-            now: DateTime<Utc>,
-        }
-
-        let data = TemplateData {
-            forecaster_cache: forecaster.cache.read().unwrap().clone(),
-            fetched: forecaster.fetched.read().unwrap().clone(),
-            now: Utc::now(),
-        };
-
-        let mut resp = Response::new();
-
-        resp.set_mut(Template::new("index", data)).set_mut(
-            status::Ok,
-        );
-
-        Ok(resp)
-    }
 
     let _server = Iron::new(chain)
         .http(config.http.clone().unwrap().addr.unwrap())
