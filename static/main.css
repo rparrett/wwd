@@ -19,6 +19,20 @@ a:active {
 a:hover {
     color: #4ca2df;
 }
+a.github svg {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 10px;
+    right: 5px;
+    fill: #268bd2;
+}
+a.github:active svg {
+    fill: #4ca2df;
+}
+a.github:hover svg {
+    fill: #4ca2df;
+}
 .forecasts {
     column-count: 1;
 }
