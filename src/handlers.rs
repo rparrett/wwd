@@ -3,7 +3,7 @@ use iron::status;
 
 use chrono::{DateTime, Utc};
 
-use forecaster::{Forecaster, BasicWeekendForecast};
+use forecaster::{BasicWeekendForecast, Forecaster};
 
 use hbs::Template;
 
@@ -23,9 +23,8 @@ pub fn get_index(_: &mut Request, forecaster: &Forecaster) -> IronResult<Respons
 
     let mut resp = Response::new();
 
-    resp.set_mut(Template::new("index", data)).set_mut(
-        status::Ok,
-    );
+    resp.set_mut(Template::new("index", data))
+        .set_mut(status::Ok);
 
     Ok(resp)
 }

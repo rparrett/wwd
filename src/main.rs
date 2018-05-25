@@ -2,15 +2,15 @@
 extern crate serde_derive;
 extern crate serde_json;
 
-extern crate toml;
+extern crate chrono;
 extern crate darksky;
 extern crate hyper;
 extern crate hyper_native_tls;
-extern crate chrono;
+extern crate toml;
 
 extern crate iron;
-extern crate router;
 extern crate logger;
+extern crate router;
 #[macro_use]
 extern crate log;
 extern crate env_logger;
@@ -18,34 +18,33 @@ extern crate handlebars_iron as hbs;
 extern crate mount;
 extern crate staticfile;
 
-extern crate tokio_timer;
-extern crate tokio_core;
 extern crate futures;
+extern crate tokio_core;
+extern crate tokio_timer;
 
+use std::env;
 use std::path::Path;
 use std::time::*;
-use std::env;
 
-use iron::prelude::*;
-use router::Router;
-use logger::Logger;
-use env_logger::LogBuilder;
 use chrono::Local;
-use hbs::{HandlebarsEngine, DirectorySource};
-use mount::Mount;
-use staticfile::Static;
 use config::Config;
+use env_logger::LogBuilder;
 use forecaster::Forecaster;
+use hbs::{DirectorySource, HandlebarsEngine};
+use iron::prelude::*;
+use logger::Logger;
+use mount::Mount;
+use router::Router;
+use staticfile::Static;
 
-use tokio_timer::*;
 use futures::*;
 use tokio_core::reactor::Core;
+use tokio_timer::*;
 
-
-mod helper;
-mod forecaster;
 mod config;
+mod forecaster;
 mod handlers;
+mod helper;
 
 fn main() {
     let mut builder = LogBuilder::new();
@@ -72,18 +71,12 @@ fn main() {
     let (logger_before, logger_after) = Logger::new(None);
 
     let mut hbse = HandlebarsEngine::new();
-    hbse.handlebars_mut().register_helper(
-        "round",
-        Box::new(helper::round),
-    );
-    hbse.handlebars_mut().register_helper(
-        "color",
-        Box::new(helper::color),
-    );
-    hbse.handlebars_mut().register_helper(
-        "time_diff_in_words",
-        Box::new(helper::time_diff_in_words),
-    );
+    hbse.handlebars_mut()
+        .register_helper("round", Box::new(helper::round));
+    hbse.handlebars_mut()
+        .register_helper("color", Box::new(helper::color));
+    hbse.handlebars_mut()
+        .register_helper("time_diff_in_words", Box::new(helper::time_diff_in_words));
     hbse.add(Box::new(DirectorySource::new("templates", ".hbs")));
 
     hbse.reload().unwrap();

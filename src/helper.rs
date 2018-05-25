@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 
 use serde_json;
 
-use hbs::handlebars::{Helper, RenderContext, RenderError, Handlebars};
+use hbs::handlebars::{Handlebars, Helper, RenderContext, RenderError};
 
 pub fn round(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
     let param = h.param(0).unwrap().value();

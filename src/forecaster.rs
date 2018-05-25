@@ -1,9 +1,9 @@
 use darksky::*;
-use hyper::net::HttpsConnector;
 use hyper::Client;
+use hyper::net::HttpsConnector;
 use hyper_native_tls::NativeTlsClient;
 
-use chrono::{DateTime, Utc, Weekday, Datelike, TimeZone};
+use chrono::{DateTime, Datelike, TimeZone, Utc, Weekday};
 
 use iron::typemap::Key;
 
