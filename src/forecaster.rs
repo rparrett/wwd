@@ -1,14 +1,14 @@
 use darksky::*;
-use hyper::Client;
 use hyper::net::HttpsConnector;
+use hyper::Client;
 use hyper_native_tls::NativeTlsClient;
 
 use chrono::{DateTime, Datelike, TimeZone, Utc, Weekday};
 
 use iron::typemap::Key;
 
-use config::DarkskyConfig;
-use config::Location;
+use crate::config::DarkskyConfig;
+use crate::config::Location;
 
 use std::sync::{Arc, RwLock};
 

@@ -3,7 +3,7 @@ use iron::status;
 
 use chrono::{DateTime, Utc};
 
-use forecaster::{BasicWeekendForecast, Forecaster};
+use crate::forecaster::{BasicWeekendForecast, Forecaster};
 
 use hbs::Template;
 

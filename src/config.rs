@@ -1,4 +1,4 @@
-use std::error::Error;
+use anyhow::Result;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -30,7 +30,7 @@ pub struct Location {
 }
 
 impl Config {
-    pub fn new(filename: &str) -> Result<Config, Box<Error>> {
+    pub fn new(filename: &str) -> Result<Config> {
         let mut input = String::new();
 
         File::open(filename)?.read_to_string(&mut input)?;
