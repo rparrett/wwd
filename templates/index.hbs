@@ -14,13 +14,12 @@
             <a href="https://darksky.net/poweredby/">Powered By Darksky</a><br/>
             Last updated {{time_diff_in_words fetched now}} ago
         </p>
-    
         <div class="forecasts">
             {{#each forecaster_cache}}
             <div class="forecast">
                 <div class="location-name">
                     <a href="{{location.link}}">&beta;</a>
-                    <a href="https://darksky.net/forecast/{{location.lat}},{{location.lon}}/us12/en">&#x26A1;</a>
+                    <a href="https://merrysky.net/forecast/{{location.lat}},{{location.lon}}/us">&#x26A1;</a>
                     <strong>{{location.name}}</strong>
                 </div>
                 {{#each days}}
